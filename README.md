@@ -1,17 +1,20 @@
 # the0n3 blog
 
-一个基于 Markdown 的极简博客系统，专注 Markdown 写作，自动生成静态站点并支持一键部署。
+<div align="center">
+<h3>一个基于 Markdown 的极简博客系统，专注 Markdown 写作，自动生成静态站点并支持一键部署。</h3>
 
-👉 在线演示：https://blog.the0n3.top/
+![PHP](https://img.shields.io/badge/PHP-%E2%89%A5%207.4-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
 
-浅色主题：
 
-![](/images/blog-deployment/light.png)
+<img src="images/blog-deployment/light.png"/>
 
-深色主题：
 
-![](/images/blog-deployment/dark.png)
+<img src="images/blog-deployment/dark.png"/>
 
+
+</div>
 
 ## ✨ 特性
 
