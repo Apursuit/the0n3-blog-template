@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演示站点 - 博客README.md</title>
+        <meta name="description" content="演示站点描述">
+            <link rel="canonical" href="https://demo.the0n3.top">
+        <script>
+        (function () {
+            try {
+                var key = 'theme';
+                var saved = localStorage.getItem(key);
+                var theme = (saved === 'dark' || saved === 'light') ? saved : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                document.documentElement.style.colorScheme = theme;
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.documentElement.style.colorScheme = 'light';
+            }
+        })();
+    </script>
+    <!-- 使用 GitHub Markdown 样式 -->
+    <link rel="stylesheet" href="/assets/css/github-markdown.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+            <link rel="stylesheet" href="/assets/css/reading-progress.css">
+            <link rel="stylesheet" href="/assets/css/image-enhance.css">
+        <link rel="stylesheet" href="/assets/css/nav-reveal.css">
+    <link rel="stylesheet" href="/assets/css/search.css">
+    <!-- 代码高亮样式 -->
+    <link rel="stylesheet" href="/assets/prism/prism.css">
+</head>
+<body>
+        <div class="reading-progress" aria-hidden="true">
+        <div class="reading-progress__bar"></div>
+    </div>
+        <header>
+        <nav>
+            <div class="nav-right">
+                <a href="/">首页</a>
+                <a href="/archives">归档</a>
+                <a href="/categories">分类</a>
+                <a href="/tags">标签</a>
+                
+                <!-- 搜索框 -->
+                <div class="search-box">
+                    <input 
+                        id="searchInput" 
+                        type="text" 
+                        placeholder="搜索文章..."
+                        autocomplete="off"
+                    >
+                    <div id="searchResults" class="search-results" style="display:none;">
+                        <ul></ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+                <div class="page-layout">
+            <main class="markdown-body">
+                
+<article class="post-content">
+    <h1>博客README.md</h1>
+    <p>
+        <span class="meta">发布于: 2026-03-24 15:36</span>
+    </p>
+    <div class="post-body">
+        <h1>the0n3 blog</h1>
+<div align="center">
+<h5>一个基于 Markdown 的极简博客系统，专注 Markdown 写作，自动生成静态站点并支持一键部署。</h5>
+<p><img src="https://img.shields.io/badge/PHP-%E2%89%A5%207.4-blue" alt="PHP">
+<img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+<img src="https://img.shields.io/badge/build-passing-brightgreen" alt="Build"></p>
+<img src="images/blog-deployment/light.png">
+<img src="images/blog-deployment/dark.png">
+</div>
+<h2>✨ 特性</h2>
+<h3>界面与体验</h3>
+<ul>
+<li>🌗 支持深浅主题切换</li>
+<li>🧭 向上滚动自动显示导航栏</li>
+<li>📖 阅读进度条与目录联动高亮</li>
+<li>🧩 文章页可选目录（基于 h2/h3 自动生成）</li>
+<li>🖼️ 图片增强（懒加载 + 点击放大）</li>
+</ul>
+<h3>写作与内容</h3>
+<ul>
+<li>📝 使用带 YAML Front Matter 的 Markdown 作为文章源</li>
+<li>🏷️ 自动生成首页、标签页、分类页、归档页、文章详情页</li>
+<li>💡 Callout 语法支持（[!NOTE] / [!TIP] 等）</li>
+</ul>
+<h3>构建与部署</h3>
+<ul>
+<li>🚀 GitHub Actions 自动构建并部署到 gh-pages 分支</li>
+<li>📦 构建过程写入 logs/build.log</li>
+<li>🗺️ 自动生成 dist/sitemap.xml（基于 config/site.php）</li>
+</ul>
+<h3>其他</h3>
+<ul>
+<li>💬 Giscus 评论系统支持（需自行配置 repo 等参数）</li>
+<li>🎨 Prism 代码高亮</li>
+</ul>
+<h2>🚀快速上手</h2>
+<h3>环境要求</h3>
+<ul>
+<li>PHP ≥ 7.4</li>
+<li>Composer</li>
+</ul>
+<p>打开 PowerShell（建议以普通用户运行），执行：</p>
+<p>过程中会提示是否修改执行策略，输入 Y 确认。</p>
+<pre><code class="language-powershell">Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex</code></pre>
+<p>安装 PHP 和 Composer</p>
+<pre><code class="language-powershell">scoop install php composer git</code></pre>
+<p><img src="/images/blog-deployment/0.png" alt=""></p>
+<p>安装完成后，验证是否成功：</p>
+<pre><code class="language-powershell">php -v
+composer -V
+git -v</code></pre>
+<p><img src="/images/blog-deployment/01.png" alt=""></p>
+<h3>克隆项目到本地：</h3>
+<pre><code class="language-bash">git clone https://hk.gh-proxy.org/https://github.com/Apursuit/the0n3-blog-template.git
+cd the0n3-blog-template</code></pre>
+<h3>安装依赖</h3>
+<p>composer 依赖安装：</p>
+<pre><code class="language-bash">composer install</code></pre>
+<h3>开始写作</h3>
+<p>运行 main.php 生成新文章模板：</p>
+<pre><code class="language-bash">php main.php new "文章标题"</code></pre>
+<p>手动在 posts/ 下会创建一个新的 Markdown 文件，把生成的模板内容复制进去</p>
+<p><strong>注意，--- 分隔符必须顶格、并且必须出现在文件开头</strong></p>
+<p><img src="/images/blog-deployment/13.png" alt=""></p>
+<h3>构建博客</h3>
+<pre><code class="language-bash">php main.php build</code></pre>
+<p>构建流程:</p>
+<ol>
+<li>清空 dist/</li>
+<li>资源映射</li>
+<li>解析 Markdown</li>
+<li>校验数据</li>
+<li>构建数据索引</li>
+<li>渲染页面</li>
+</ol>
+<p>最终生成所有静态文件到 dist/ 目录，博客即完成构建，在 dist 目录下开启web服务即可预览。</p>
+<pre><code class="language-bash">php -S localhost:8000 -t dist/</code></pre>
+<p>如果部署在 github pages，把 dist/ 目录下的所有文件推送到 gh-pages 分支即可。</p>
+<h3>自动构建</h3>
+<p>功能说明：本地在 posts 目录文章书写完成后，提交到 GitHub 仓库，GitHub Action 会自动触发构建流程，构建完成后会将 dist 目录下的静态文件推送到 gh-pages 分支，实现自动部署。</p>
+<p>需要给项目开启 action 的读写权限</p>
+<p>Settings → Actions → 常规（General）下滑找到 Workflow permissions，选择 Allow GitHub Actions to read and write permissions</p>
+<p><img src="/images/blog-deployment/14.png" alt=""></p>
+<h2>目录结构</h2>
+<pre><code class="language-plaintext">.
+├─ assets/      前端资源（CSS / JS / Prism）
+├─ config/      站点配置
+├─ logs/        构建日志
+├─ posts/       Markdown 文章（支持子目录）
+├─ public/      静态资源（原样拷贝到 dist/）
+├─ images/      图片资源（原样拷贝到 dist/images/）
+├─ src/         核心 PHP 逻辑
+├─ templates/   页面模板
+├─ dist/        构建输出（生成后出现）
+└─ main.php     CLI 入口</code></pre>
+<h2>文章格式</h2>
+<p>每篇文章为 Markdown 文件，需包含 YAML Front Matter，例如：</p>
+<pre><code class="language-yaml">---
+title: Hello World
+date: 2026-03-20
+permalink: /posts/hello-world/
+tags:
+    - 示例
+categories:
+    - 示例
+pin: 0
+draft: false
+sidebar: true
+---</code></pre>
+<p>文章文件放在 posts/ 下即可（可分子目录）。</p>
+<h3>Front Matter 字段说明</h3>
+<p>必需字段（缺失会报错）：</p>
+<ul>
+<li>title：文章标题</li>
+<li>date：日期（支持 YYYY-MM-DD 或可被解析的字符串）</li>
+<li>permalink：文章永久链接（例如 /posts/hello-world/）</li>
+</ul>
+<p>可选字段（未填写会自动补默认值）：</p>
+<ul>
+<li>tags：标签数组，默认 []</li>
+<li>categories：分类数组，默认 []（支持单个字符串）</li>
+<li>pin：置顶优先级，0-3，数字越小优先级越高，默认 0</li>
+<li>draft：是否草稿，默认 false（true 时构建会跳过）</li>
+<li>sidebar：是否显示文章目录侧边栏，默认 true</li>
+</ul>
+<h2>配置说明</h2>
+<ul>
+<li>config/site.php：站点标题、作者、站点地址等<ul>
+<li>其中 url 会用于生成 sitemap.xml 的站点根地址（例如 <a href="https://example.com">https://example.com</a>）</li>
+</ul>
+</li>
+</ul>
+<h3>Giscus 评论系统</h3>
+<p>默认关闭。如需启用，请在 config/site.php 的 giscus 配置中填入你自己的参数（repo / repo_id / category / category_id）。</p>
+<p>重要：不要直接使用他人的配置，否则评论会写入对方仓库。</p>
+<p>注意：启用 Giscus 评论系统需要在 GitHub 仓库创建 Discussions，具体步骤参考这篇文章 <a href="https://www.lixueduan.com/posts/blog/02-add-giscus-comment/">https://www.lixueduan.com/posts/blog/02-add-giscus-comment/</a></p>
+<h2>备注</h2>
+<ul>
+<li>主题与排版变量在 assets/css/site.css 中</li>
+<li>目录由前端脚本根据 h2/h3 生成</li>
+<li>阅读进度条：assets/js/readingProgress.js + assets/css/reading-progress.css</li>
+<li>图片增强：assets/js/imageEnhance.js + assets/css/image-enhance.css</li>
+<li>导航栏自动显示：assets/js/navReveal.js + assets/css/nav-reveal.css</li>
+<li>Callout 支持由后处理完成（src/Markdown.php）</li>
+<li>构建日志写入 logs/build.log（默认追加写入；超过 14 天会自动清空重写；每次构建会写入分隔线）</li>
+<li>main.php 固定时区为 Asia/Shanghai，保证日志与日期输出为北京时间</li>
+<li>permalink 会做冲突校验：不能与系统页（/tags/、/categories/、/archives/）或 public/images 下已有文件路径冲突</li>
+</ul>
+<h2>性能测试</h2>
+<p>在一台 Windows 设备上，构建一个包含 182 篇文章、约 200MB 图片资源的博客，完整构建时间约为 2 秒。</p>
+<p>主要耗时集中在静态资源复制（<code>assets/</code>、<code>public/</code>、<code>images/</code> → <code>dist/</code>），Markdown 解析与页面渲染开销较低。</p>
+<pre><code class="language-bash">$ php main.php build
+[2026-04-09 13:53:11] [信息] 开始构建...
+[2026-04-09 13:53:11] [信息] 清理 dist 目录...
+[2026-04-09 13:53:11] [信息] 1. 清空 dist/ 用时 0.376 秒。
+[2026-04-09 13:53:11] [信息] 复制静态资源...
+[2026-04-09 13:53:12] [信息] 2. 资源映射 用时 1.021 秒。
+[2026-04-09 13:53:12] [信息] 加载并处理文章...
+[2026-04-09 13:53:12] [信息] 跳过草稿：2 篇。
+[2026-04-09 13:53:12] [信息] 3. 解析 Markdown 用时 0.042 秒。
+[2026-04-09 13:53:12] [信息] 校验文章数据...
+[2026-04-09 13:53:12] [信息] 4. 校验数据 用时 0.004 秒。
+[2026-04-09 13:53:12] [信息] 准备数据...
+[2026-04-09 13:53:12] [信息] 5. 构建数据索引 用时 0.161 秒。
+[2026-04-09 13:53:12] [信息] 生成页面...
+[2026-04-09 13:53:13] [信息] 6. 渲染页面 用时 0.153 秒。
+[2026-04-09 13:53:13] [信息] 生成搜索索引...
+[2026-04-09 13:53:13] [信息] 搜索索引已生成：919.57KB
+[2026-04-09 13:53:13] [信息] 7. 生成搜索索引 用时 0.013 秒。
+[2026-04-09 13:53:13] [信息] 构建完成，用时 1.77 秒。
+[2026-04-09 13:53:13] [信息]  - 生成文章数：186
+[2026-04-09 13:53:13] [信息]  - 标签数：144
+[2026-04-09 13:53:13] [信息]  - 分类数：23</code></pre>
+<h2>计划中的功能</h2>
+<ul>
+<li>Logo、favicon、社交链接、关于页等站点细节</li>
+<li>增量构建</li>
+</ul>
+<h2>📝 贡献</h2>
+<p>欢迎提交 Issue 和 Pull Request！</p>
+<h2>📄 许可证</h2>
+<p>MIT</p>    </div>
+    </article>
+
+
+
+            </main>
+                <aside class="post-toc" aria-label="Table of contents">
+        <div class="toc-title">目录</div>
+        <nav class="toc-list"></nav>
+    </aside>
+            </div>
+        <button id="backToTop" class="fab fab-top" type="button" aria-label="返回顶部" title="返回顶部">↑</button>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="切换主题" title="切换主题"></button>
+    <script src="/assets/js/site.js"></script>
+        <script src="/assets/js/navReveal.js"></script>
+        <script src="/assets/js/readingProgress.js"></script>
+            <script src="/assets/js/imageEnhance.js"></script>
+        <!-- 启动代码高亮及行号显示 -->
+    <script src="/assets/prism/prism.js"></script>
+    <script src="/assets/prism/prism-line-number.js"></script>
+    <!-- 主题切换 -->
+    <script src="/assets/js/ThemeSwitch.js"></script>
+    <!-- 搜索功能 -->
+    <script src="/assets/js/fuse.js"></script>
+    <script src="/assets/js/search.js"></script>
+</body>
+</html>

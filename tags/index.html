@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演示站点 - All Tags</title>
+        <meta name="description" content="演示站点描述">
+            <link rel="canonical" href="https://demo.the0n3.top">
+        <script>
+        (function () {
+            try {
+                var key = 'theme';
+                var saved = localStorage.getItem(key);
+                var theme = (saved === 'dark' || saved === 'light') ? saved : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                document.documentElement.style.colorScheme = theme;
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.documentElement.style.colorScheme = 'light';
+            }
+        })();
+    </script>
+    <!-- 使用 GitHub Markdown 样式 -->
+    <link rel="stylesheet" href="/assets/css/github-markdown.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+        <link rel="stylesheet" href="/assets/css/tax-accordion.css">
+                <link rel="stylesheet" href="/assets/css/nav-reveal.css">
+    <link rel="stylesheet" href="/assets/css/search.css">
+    <!-- 代码高亮样式 -->
+    <link rel="stylesheet" href="/assets/prism/prism.css">
+</head>
+<body>
+        <header>
+        <nav>
+            <div class="nav-right">
+                <a href="/">首页</a>
+                <a href="/archives">归档</a>
+                <a href="/categories">分类</a>
+                <a href="/tags">标签</a>
+                
+                <!-- 搜索框 -->
+                <div class="search-box">
+                    <input 
+                        id="searchInput" 
+                        type="text" 
+                        placeholder="搜索文章..."
+                        autocomplete="off"
+                    >
+                    <div id="searchResults" class="search-results" style="display:none;">
+                        <ul></ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+                <main class="markdown-body">
+            
+<h1>标签</h1>
+<ul class="tax-accordion">
+            <li class="tax-item" data-posts="[{&quot;title&quot;:&quot;博客部署与使用指南&quot;,&quot;permalink&quot;:&quot;\/posts\/blog-deployment\/&quot;,&quot;date&quot;:&quot;2026-03-22&quot;}]">
+            <button class="tax-toggle" type="button" aria-expanded="false">
+                <span class="tax-name">部署</span>
+                <span class="tax-count">1</span>
+                <span class="tax-chevron" aria-hidden="true"></span>
+            </button>
+            <ul class="post-list" aria-hidden="true"></ul>
+        </li>
+    </ul>
+
+        </main>
+        <button id="backToTop" class="fab fab-top" type="button" aria-label="返回顶部" title="返回顶部">↑</button>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="切换主题" title="切换主题"></button>
+    <script src="/assets/js/site.js"></script>
+        <script src="/assets/js/taxAccordion.js"></script>
+        <script src="/assets/js/navReveal.js"></script>
+            <!-- 启动代码高亮及行号显示 -->
+    <script src="/assets/prism/prism.js"></script>
+    <script src="/assets/prism/prism-line-number.js"></script>
+    <!-- 主题切换 -->
+    <script src="/assets/js/ThemeSwitch.js"></script>
+    <!-- 搜索功能 -->
+    <script src="/assets/js/fuse.js"></script>
+    <script src="/assets/js/search.js"></script>
+</body>
+</html>
