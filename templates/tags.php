@@ -1,6 +1,5 @@
 <?php
 $pageTitle = 'All Tags';
-$enableTaxAccordion = true;
 ob_start();
 ?>
 
@@ -32,5 +31,8 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
+
+$pageCanonical = rtrim($site['url'] ?? '', '/') . '/tags/';
+
 include 'layout.php';
 ?>
