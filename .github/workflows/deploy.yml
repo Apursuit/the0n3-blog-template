@@ -13,6 +13,10 @@ concurrency:
   group: pages-deploy
   cancel-in-progress: true
 
+# 强制使用 Node.js 24 版本，测试 JavaScript Actions 的兼容性
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -20,7 +24,7 @@ jobs:
     steps:
       # 1) 拉取代码
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # 2) 安装 PHP（启用 zip 扩展）
       - name: Setup PHP
@@ -32,7 +36,7 @@ jobs:
 
       # 3) 缓存 Composer 依赖，加速构建
       - name: Cache Composer
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
