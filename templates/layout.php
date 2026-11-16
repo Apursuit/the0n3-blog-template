@@ -1,13 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($site['title'] ?? 'My Blog') ?><?= isset($pageTitle) ? ' - ' . htmlspecialchars($pageTitle) : '' ?></title>
+    <?php $titleText = (isset($pageTitle) && $pageTitle !== '') ? $pageTitle . ' - ' . ($site['title'] ?? 'My Blog') : ($site['title'] ?? 'My Blog'); ?>
+    <title><?= htmlspecialchars($titleText) ?></title>
     <?php
     $canonicalUrl = $pageCanonical ?? ($site['url'] ?? '/');
+    $siteOrigin   = rtrim($site['url'] ?? '', '/');
+    $currentPath  = $canonicalUrl;
+    if ($siteOrigin !== '' && strpos($currentPath, $siteOrigin) === 0) {
+        $currentPath = substr($currentPath, strlen($siteOrigin));
+    }
+    if ($currentPath === '') {
+        $currentPath = '/';
+    }
     $metaDesc      = $pageDescription ?? ($site['description'] ?? '');
-    $ogTitle       = $ogTitle ?? $pageTitle ?? ($site['title'] ?? '');
+    $ogTitle       = $ogTitle ?? $titleText;
     $ogType        = $ogType ?? 'website';
     $ogImage       = $ogImage ?? ($site['og_image'] ?? '');
     $ogLocale      = $ogLocale ?? ($site['og_locale'] ?? 'zh_CN');
@@ -46,6 +55,8 @@
             }
         })();
     </script>
+    <!-- 评论系统预连接：giscus 由前端按访客主题动态注入，提前建连可抵消注入延迟 -->
+    <link rel="preconnect" href="https://giscus.app" crossorigin>
     <!-- 使用 GitHub Markdown 样式 -->
     <link rel="stylesheet" href="/assets/css/github-markdown.css">
     <link rel="stylesheet" href="/assets/css/site.css">
@@ -75,6 +86,10 @@
     <header>
         <nav>
             <div class="nav-right">
+                <details class="nav-menu">
+                    <summary class="nav-toggle" aria-label="打开菜单"><span aria-hidden="true">☰</span></summary>
+                </details>
+                <div class="nav-links">
                 <?php
                 $navItems = $navItems ?? ($site['nav'] ?? []);
                 foreach ($navItems as $navItem):
@@ -83,8 +98,10 @@
                     if ($navLabel === '') {
                         continue;
                     }
+                    $isActive = strpos($navUrl, '/') === 0
+                        && rtrim($navUrl, '/') === rtrim($currentPath, '/');
                 ?>
-                <a href="<?= htmlspecialchars($navUrl) ?>"><?= htmlspecialchars($navLabel) ?></a>
+                <a href="<?= htmlspecialchars($navUrl) ?>"<?= $isActive ? ' class="is-active" aria-current="page"' : '' ?>><?= htmlspecialchars($navLabel) ?></a>
                 <?php endforeach; ?>
                 <?php if (false): ?>
                 <a href="/">首页</a>
@@ -95,6 +112,7 @@
                 <!-- 搜索入口：
                      导航栏只保留触发按钮，具体搜索交互放进全局弹层 -->
                 <?php endif; ?>
+                </div>
                 <button
                     id="searchTrigger"
                     class="search-trigger"
@@ -195,6 +213,8 @@
     <script src="/assets/prism/prism-line-number.js"></script>
     <!-- 主题切换 -->
     <script src="/assets/js/ThemeSwitch.js"></script>
+    <!-- 弹簧动画工具（搜索弹窗/灯箱进出场依赖） -->
+    <script src="/assets/js/spring.js"></script>
     <!-- 搜索功能 -->
     <script src="/assets/js/fuse.js"></script>
     <script src="/assets/js/search.js"></script>

@@ -25,10 +25,6 @@ class PageGenerator
         $buildTimestamp = date('c');
         $sitemapEntries = [];
 
-        if ($siteUrl !== '') {
-            $sitemapEntries['/'] = $buildTimestamp;
-        }
-
         foreach ($posts as $post) {
             $path = $this->config['dist_path'] . $post['frontMatter']['permalink'];
             if (!is_dir($path)) {
@@ -45,12 +41,16 @@ class PageGenerator
         foreach ($pages as $page) {
             $this->generateStandalonePage($page, $siteData, $navItems);
             if ($siteUrl !== '') {
-                $sitemapEntries[$page['frontMatter']['permalink']] = $buildTimestamp;
+                // 独立页同样是 md 文件，取自身最后一次提交时间
+                $pageGitTs = GitLastmod::resolve($page['sourcePath'] ?? '');
+                $sitemapEntries[$page['frontMatter']['permalink']] = $pageGitTs !== null
+                    ? date('c', $pageGitTs)
+                    : $buildTimestamp;
             }
         }
 
-        $this->generateIndexPages($posts, $siteData, $navItems, $sitemapEntries, $buildTimestamp, $siteUrl);
-        $this->generateTaxonomyPages($tags, $categories, $archives, $siteData, $navItems, $sitemapEntries, $buildTimestamp, $siteUrl);
+        $this->generateIndexPages($posts, $siteData, $navItems);
+        $this->generateTaxonomyPages($tags, $categories, $archives, $siteData, $navItems, $siteUrl);
 
         $notFoundHtml = $this->renderer->render('404', [
             'site' => $siteData,
@@ -59,14 +59,34 @@ class PageGenerator
         file_put_contents($this->config['dist_path'] . '/404.html', $notFoundHtml);
 
         if ($siteUrl !== '') {
+            $postTimestamps = [];
             foreach ($posts as $post) {
                 $permalink = $post['frontMatter']['permalink'] ?? '';
                 if ($permalink === '') {
                     continue;
                 }
-                $lastmod = Utils::formatDate($post['frontMatter']['date'] ?? '', 'c');
-                $sitemapEntries[$permalink] = $lastmod !== '' ? $lastmod : $buildTimestamp;
+
+                // 优先取 git 最后提交时间；未提交的新文件回退到 date
+                $gitTs = GitLastmod::resolve($post['sourcePath'] ?? '');
+                $lastmod = $gitTs !== null
+                    ? date('c', $gitTs)
+                    : Utils::formatDate($post['frontMatter']['date'] ?? '', 'c');
+                if ($lastmod === '') {
+                    $lastmod = $buildTimestamp;
+                }
+
+                $sitemapEntries[$permalink] = $lastmod;
+
+                $ts = strtotime($lastmod);
+                if ($ts !== false) {
+                    $postTimestamps[] = $ts;
+                }
             }
+
+            // 首页没有独立源文件，其内容即最新文章列表，取全站文章的最新时间
+            $sitemapEntries['/'] = $postTimestamps
+                ? date('c', max($postTimestamps))
+                : $buildTimestamp;
 
             $sitemapXml = $this->buildSitemapXml($siteUrl, $sitemapEntries);
             file_put_contents($this->config['dist_path'] . '/sitemap.xml', $sitemapXml);
@@ -89,9 +109,10 @@ class PageGenerator
         file_put_contents($path . 'index.html', $html);
     }
 
-    private function generateIndexPages(array $posts, array $siteData, array $navItems, array &$sitemapEntries, string $buildTimestamp, string $siteUrl): void
+    private function generateIndexPages(array $posts, array $siteData, array $navItems): void
     {
-        $pageSize = 15;
+        # 每页显示的文章数量
+        $pageSize = 10;
         $pinnedPosts = array_filter($posts, function ($post) {
             return ($post['frontMatter']['pin'] ?? 0) > 0;
         });
@@ -142,9 +163,6 @@ class PageGenerator
 
             if ($page === 1) {
                 file_put_contents($this->config['dist_path'] . '/index.html', $indexHtml);
-                if ($siteUrl !== '') {
-                    $sitemapEntries['/'] = $buildTimestamp;
-                }
                 continue;
             }
 
@@ -153,14 +171,10 @@ class PageGenerator
                 mkdir($pagePath, 0755, true);
             }
             file_put_contents($pagePath . 'index.html', $indexHtml);
-
-            if ($siteUrl !== '') {
-                $sitemapEntries['/page/' . $page . '/'] = $buildTimestamp;
-            }
         }
     }
 
-    private function generateTaxonomyPages(array $tags, array $categories, array $archives, array $siteData, array $navItems, array &$sitemapEntries, string $buildTimestamp, string $siteUrl): void
+    private function generateTaxonomyPages(array $tags, array $categories, array $archives, array $siteData, array $navItems, string $siteUrl): void
     {
         $tagsPath = $this->config['dist_path'] . '/tags/';
         mkdir($tagsPath, 0755, true);
@@ -189,10 +203,67 @@ class PageGenerator
         ]);
         file_put_contents($archivePath . 'index.html', $archiveHtml);
 
-        if ($siteUrl !== '') {
-            $sitemapEntries['/tags/'] = $buildTimestamp;
-            $sitemapEntries['/categories/'] = $buildTimestamp;
-            $sitemapEntries['/archives/'] = $buildTimestamp;
+        // 索引页与下方分类/标签落地页均不进 sitemap：它们是站点导航结构而非内容页，
+        // 提交只会稀释 sitemap 中真实内容的占比。页面本身照常生成，读者访问不受影响。
+
+        // 索引页之后生成各条目的独立落地页，顺序与索引页一致（数据层已按文章数降序）
+        $this->generateTaxonomyChildren($categories, 'category', '分类', '/categories/', $siteData, $navItems, $siteUrl);
+        $this->generateTaxonomyChildren($tags, 'tag', '标签', '/tags/', $siteData, $navItems, $siteUrl);
+    }
+
+    /**
+     * 生成分类 / 标签的独立落地页，形如 /categories/{原始名称}/。
+     *
+     * 目录名保留原始名称，URL 由 Taxonomy::urlPath() 做一次 percent-encoding。
+     * 不分页：单页列出该条目下全部文章，模板内按年份分节。
+     *
+     * @param array  $items           形如 [名称 => post[]]
+     * @param string $kind            category | tag
+     * @param string $label           报错与标题用的中文标签
+     * @param string $basePath        形如 /categories/
+     * @param array  $siteData
+     * @param array  $navItems
+     * @param string $siteUrl
+     */
+    private function generateTaxonomyChildren(
+        array $items,
+        string $kind,
+        string $label,
+        string $basePath,
+        array $siteData,
+        array $navItems,
+        string $siteUrl
+    ): void {
+        // NTFS 大小写不敏感：本地 Windows 预览时，大小写不同的两个名称会写进同一个目录并
+        // 静默覆盖（线上 Linux 则是两个独立页面）。只告警不自动改名，是否合并由作者决定。
+        foreach (Taxonomy::findCaseConflicts(array_keys($items)) as $group) {
+            Utils::log(
+                "{$label}目录名大小写冲突：" . implode(' / ', $group)
+                . '，本地 Windows 预览会互相覆盖',
+                'warning'
+            );
+        }
+
+        foreach ($items as $name => $posts) {
+            $name = (string) $name;
+            $urlPath = $basePath . Taxonomy::urlPath($name) . '/';
+            $targetPath = $this->config['dist_path'] . $basePath . Taxonomy::dirName($name, $label);
+
+            if (!is_dir($targetPath)) {
+                mkdir($targetPath, 0755, true);
+            }
+
+            $html = $this->renderer->render('taxonomy', [
+                'type' => $kind,
+                'name' => $name,
+                'posts' => $posts,
+                'pageTitle' => "{$label}：{$name}",
+                'pageDescription' => "{$label}「{$name}」下的全部文章，共 " . count($posts) . ' 篇。',
+                'pageCanonical' => $siteUrl . $urlPath,
+                'site' => $siteData,
+                'navItems' => $navItems,
+            ]);
+            file_put_contents($targetPath . '/index.html', $html);
         }
     }
 

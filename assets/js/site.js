@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const backToTop = document.getElementById('backToTop');
     if (!backToTop) return;
 
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const isPostPage = !!document.querySelector('main.markdown-body article');
     if (!isPostPage) {
         backToTop.classList.remove('is-visible');
@@ -50,11 +52,18 @@ document.addEventListener('DOMContentLoaded', () => {
         tocContainer.addEventListener('click', (event) => {
             const target = event.target;
             if (target && target.tagName === 'A' && target.hash) {
-                const el = document.getElementById(target.hash.slice(1));
+                // .hash 返回 URL 编码片段（中文 id 如 %E6%B5%81...），需解码后定位元素
+                let id = target.hash.slice(1);
+                try {
+                    id = decodeURIComponent(id);
+                } catch (e) {
+                    id = target.hash.slice(1);
+                }
+                const el = document.getElementById(id);
                 if (el) {
                     event.preventDefault();
                     try {
-                        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        el.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
                     } catch (e) {
                         el.scrollIntoView(true);
                     }
@@ -87,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     backToTop.addEventListener('click', () => {
         try {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
         } catch (e) {
             window.scrollTo(0, 0);
         }

@@ -25,6 +25,9 @@ jobs:
       # 1) 拉取代码
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          # sitemap 的 lastmod 取自 git 提交历史，浅克隆会导致读取不到历史
+          fetch-depth: 0
 
       # 2) 安装 PHP（启用 zip 扩展）
       - name: Setup PHP
@@ -55,8 +58,17 @@ jobs:
         run: php main.php build
         continue-on-error: true
 
-      # 6) 部署 dist 到 gh-pages 分支
+      # 6) 提交新增 URL 到 IndexNow
+      - name: Submit URLs to IndexNow
+        if: steps.build.outcome == 'success'
+        run: |
+          pip install requests
+          python .github/deploy/indexnow.py
+        continue-on-error: true
+
+      # 7) 部署 dist 到 gh-pages 分支
       - name: Deploy to gh-pages
+        if: steps.build.outcome == 'success'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -64,7 +76,7 @@ jobs:
           publish_branch: gh-pages
           force_orphan: true
 
-      # 7) 构建存在解析错误时标记 job 失败
+      # 8) 构建存在解析错误时标记 job 失败
       - name: Check build errors
         if: steps.build.outcome == 'failure'
         run: exit 1
